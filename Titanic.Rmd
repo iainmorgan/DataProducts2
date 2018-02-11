@@ -1,0 +1,60 @@
+---
+title: "Titanic presentation"
+author: "Iain Morgan"
+date: "9 feb 2018"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+
+titData <- as.data.frame(Titanic)
+
+titData <- spread(titData,Survived,Freq)
+titData <- titData %>% mutate(Prob = Yes / (No + Yes))
+titData <- titData %>% unite(Sex.Age, Sex, Age, sep = " ")
+titData$Prob <- round(titData$Prob * 100,0)
+```
+
+## What is this about?
+
+This brief presentation will be looking at the survival rates of the passengers on the RMS Titanic.
+
+- Of the 2224 passengers on board, more than 1500 died in the disaster
+- The vessel was not equipped with enough lifeboats to accommodate the entire complement
+- Many of the 2nd and 3rd class passengers had difficulty reaching the boats
+
+## Survival rate of passengers by Class, Sex and Age
+
+```{r,echo=FALSE, warning=FALSE}
+
+p <- plot_ly(
+  data = titData,
+  x = ~Sex.Age,
+  y = ~Prob,
+  color = ~Class,
+  type = "scatter",
+  mode = "markers",
+  size = ~Prob,
+  text = ~paste(Class, 'class',Sex.Age, '<br>', Prob, '% survived')) %>%
+  layout(
+    title = "Survival probability of passengers on the RMS Titanic",
+    xaxis = list(title = "Passenger sex and age", titlefont = "f"),
+    yaxis = list(title = "Probability of survival", titlefont = "f")
+      )
+p
+```
+
+## Conclusions
+
+From the data, we can see:
+
+- 1st and 2nd class passengers had a higher probability of survival
+- In accordance with maritime law, women and children had a higher probability of survival
+- In general, Crew had a higher probability of survival than 3rd class passengers
+
+
